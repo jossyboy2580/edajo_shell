@@ -9,8 +9,11 @@
 int main(void)
 {
     pid_t my_pid;
+    pid_t my_ppid;
 
     my_pid = getpid();
-    printf("%u\n", my_pid);
+    my_ppid = getppid();
+    printf("My pid is %u\n", my_pid);
+    printf("My ppid is %u\n", my_ppid);
     return (0);
 }
