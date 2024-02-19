@@ -8,6 +8,7 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 	ssize_t adjusted_size = 1;
 	char buff;
 	ssize_t status;
+	(void)n;
 	int streamno = fileno(stream);
 
 	do {

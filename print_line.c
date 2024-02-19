@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "main.h"
 
 int main(void)
 {
@@ -7,7 +8,8 @@ int main(void)
 	ssize_t count;
 
 	printf("$ ");
-	count = getline(&lineptr, &num, stdin);
-	printf("%s", lineptr);
+	count = _getline(&lineptr, &num, stdin);
+	if (count != -1)
+		printf("%s", lineptr);
 	return (0);
 }

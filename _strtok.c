@@ -1,65 +1,124 @@
-#include "main.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-int check_delim(char *str, char *delim)
-{
-	int i = 0;
-
-	while (delim[i] != '\0')
-	{
-		if (delim[i] != str[i])
-			return (0);
-		i++;
-	}
-	return (1);
-}
 
 char *make_string(char *str, int start, int end)
 {
+	char *new_str = NULL;
 	int len = end - start + 1;
-	char *new = NULL;
 	int i;
 
-	new = malloc(sizeof(char) * len + 1);
-	if (new)
+	new_str = malloc(sizeof(char) * len + 1);
+	if (new_str)
 	{
-		for (i = start; i < end + 1; i++)
+		for (i = 0; i < len; i++)
 		{
-			new[i - start] = str[i];
+			new_str[i] = str[i + start];
 		}
-		new[len] = '\0';
 	}
-	return (new);
+	new_str[i - 1] = '\0';
+	return (new_str);
+}
+
+char **enlarge_toks_v(char ***toks_v, size_t size)
+{
+	char **toks_v_2;
+
+	toks_v_2 = realloc(*toks_v, sizeof(char *) * size);
+	if (toks_v_2 == NULL)
+	{
+		free(*toks_v);
+		return (NULL);
+	}
+	*toks_v = toks_v_2;
+	return (*toks_v);
+}
+
+int is_delim(char *str, char *delim, int start_pos)
+{
+	unsigned int len_delim = strlen(delim);
+	unsigned int i = 0;
+
+	for (i = 0; i < len_delim; i++)
+		if (str[start_pos + i] != delim[i])
+			return (0);
+	return (1);
 }
 
 char **_strtok(char *str, char *delim)
 {
-	char **tokenz = NULL;
-	int i, start;
-	int is_delim = 0;
-	int count = 1;
-	char *new;
+	int i;
+	int start = 0;
+	int started = 0;
+	char **toks_v = NULL;
+	char *new_token;
+	size_t toks_count = 1;
 
+	i = 0;
 	while (str[i] != '\0')
 	{
-		if (str[i] == delim[0])
-			is_delim = check_delim(str + i, delim);
-		if (is_delim)
+		if (is_delim(str, delim, i + 1) || str[i + 1] == '\0')
 		{
-			if (!start)
+			if (started)
 			{
-				i = i + strlen(delim);
+				new_token = make_string(str, start, i + 1);
+				toks_v = enlarge_toks_v(&toks_v, ++toks_count);
+				if (toks_v != NULL)
+				{
+					toks_v[toks_count - 2] = new_token;
+				}
+				start = 0;
+				started = 0;
+			}
+			else
+			{
+				i++;
 				continue;
 			}
-			new = make_string(str, start, i - 1);
-			tokenz = realloc(tokenz, sizeof(char *) * ++count);
-			if (tokenz)
+		}
+		else if (!is_delim(str, delim, i))
+		{
+			if (!started)
 			{
-				tokenz[count - 2] = new;
+				start = i;
+				started = 1;
 			}
-			is_delim = 0;
+			else
+			{
+				i++;
+				continue;
+			}
 		}
 		i++;
 	}
-	tokenz[count - 1] = NULL;
-	return (tokenz);
+	toks_v[toks_count - 1] = NULL;
+	return (toks_v);
+}
+
+void free_vec(char **vec)
+{
+	int i = 0;
+
+	while (vec[i] != NULL)
+		free(vec[i++]);
+	free(vec);
+	return;
+}
+
+int main(void)
+{
+	char *str = "Happy";
+	char *delim = " ";
+	char **toks_v = _strtok(str, delim);
+	int i = 0;
+
+	printf("Printing vectors\n");
+	while (toks_v[i] != NULL)
+	{
+		printf("Token: %s\n", toks_v[i]);
+		i++;
+	}
+	free_vec(toks_v);
+	return (0);
 }
