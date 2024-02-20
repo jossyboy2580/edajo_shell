@@ -8,6 +8,7 @@ int main(void)
 	ssize_t count;
 
 	printf("$ ");
+	fflush(stdout);
 	count = _getline(&lineptr, &num, stdin);
 	if (count != -1)
 		printf("%s", lineptr);

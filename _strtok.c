@@ -105,20 +105,3 @@ void free_vec(char **vec)
 	free(vec);
 	return;
 }
-
-int main(void)
-{
-	char *str = "Happy";
-	char *delim = " ";
-	char **toks_v = _strtok(str, delim);
-	int i = 0;
-
-	printf("Printing vectors\n");
-	while (toks_v[i] != NULL)
-	{
-		printf("Token: %s\n", toks_v[i]);
-		i++;
-	}
-	free_vec(toks_v);
-	return (0);
-}
