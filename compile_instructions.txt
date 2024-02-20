@@ -3,3 +3,10 @@ in this folder for various task
 
 Compile With: xxxxxx
 Run with: xxxxxxxx
+
+=========================
+For the Super simple shell example
+=========================
+Compile With: gcc -Wall -Wextra -Werror -pedantic ssshell.c _strtok.c _getline.c -o ssshell
+Run With: ./ssshell
+Close With: Ctrl-C 
