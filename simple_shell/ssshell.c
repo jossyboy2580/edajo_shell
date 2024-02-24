@@ -14,7 +14,7 @@
  * Return: 1 always
  */
 
-int interactive_mode(char **env)
+int interactive_mode(char **av, char **env)
 {
 	int keep_running = 1;
 	char *command = NULL;
@@ -38,7 +38,8 @@ int interactive_mode(char **env)
 		if (valid_command)
 		{
 			args[0] = valid_command;
-			printf("%s: Command is valid!\n", valid_command);
+			printf("%s: ", av[0] + 1);
+			fflush(stdout);
 			run_command(args, env, &keep_running);
 		}
 		else
@@ -57,7 +58,7 @@ int interactive_mode(char **env)
  * Return: 1 always
  */
 
-int non_interactive_mode(char **env)
+int non_interactive_mode(char **av, char **env)
 {
 	char buffer[BUFFER_SIZE];
 	ssize_t terminal_read;
@@ -75,6 +76,8 @@ int non_interactive_mode(char **env)
 		if (valid_command)
 		{
 			args[0] = valid_command;
+			printf("%s: ", av[0] + 1);
+			fflush(stdout);
 			run_command(args, env, &keep_running);
 		}
 		else
@@ -121,7 +124,7 @@ int main(int ac, char **av, char **env)
 	/* Non-interactive Mode */
 	if (!isatty(STDIN_FILENO))
 	{
-		non_interactive_mode(env);
+		non_interactive_mode(av, env);
 	}
 	else if (ac == 2)
 	{
@@ -131,7 +134,7 @@ int main(int ac, char **av, char **env)
 	else
 	{
 		/* interactive mode */
-		interactive_mode(env);
+		interactive_mode(av, env);
 	}
 	return (0);
 }
