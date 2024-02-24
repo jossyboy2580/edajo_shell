@@ -47,7 +47,7 @@ int interactive_mode(char **av, char **env)
 			printf("Command is invalid!\n");
 		}
 	}
-
+	return (1);
 }
 
 /**
