@@ -10,6 +10,7 @@
  * arguments of command piped to it
  *
  * @env: This is the array of environment variables
+ * @av: Argument variable the program was called with
  *
  * Return: 1 always
  */
@@ -19,9 +20,7 @@ int interactive_mode(char **av, char **env)
 	int keep_running = 1;
 	char *command = NULL;
 	size_t n;
-	char *valid_command;
 	ssize_t nread;
-	char **args;
 
 	while (keep_running == 1)
 	{
@@ -32,28 +31,18 @@ int interactive_mode(char **av, char **env)
 		{
 			return (-1);
 		}
-		rmv_nwline(command);
-		args = _strtok(command, " ");
-		valid_command = validate_command(args[0], env);
-		if (valid_command)
-		{
-			args[0] = valid_command;
-			printf("%s: ", av[0] + 1);
-			fflush(stdout);
-			run_command(args, env, &keep_running);
-		}
-		else
-		{
-			printf("Command is invalid!\n");
-		}
+		executioner(command, av, env);
 	}
+	free(command);
 	return (1);
 }
 
 /**
- * non_interactive_mode - This mode is activated if a command is piped into the program
+ * non_interactive_mode - This mode is activated if a command
+ * is piped into the program
  *
  * @env: The environment variables to use
+ * @av: The argument variables the program was called with
  *
  * Return: 1 always
  */
@@ -62,28 +51,14 @@ int non_interactive_mode(char **av, char **env)
 {
 	char buffer[BUFFER_SIZE];
 	ssize_t terminal_read;
-	int keep_running = 0;
-	char *valid_command;
-	char **args;
 
 
 	terminal_read = read(STDIN_FILENO, buffer, BUFFER_SIZE);
-	if (terminal_read > 0)
+	while (terminal_read > 0)
 	{
-		rmv_nwline(buffer);
-		args = _strtok(buffer, " ");
-		valid_command = validate_command(args[0], env);
-		if (valid_command)
-		{
-			args[0] = valid_command;
-			printf("%s: ", av[0] + 1);
-			fflush(stdout);
-			run_command(args, env, &keep_running);
-		}
-		else
-		{
-			printf("Is not valid");
-		}
+
+		executioner(buffer, av, env);
+		terminal_read = read(STDIN_FILENO, buffer, BUFFER_SIZE);
 	}
 	return (1);
 
@@ -93,20 +68,29 @@ int non_interactive_mode(char **av, char **env)
  * file_input_mode - This mode is activated if a file was sent to the program
  *
  * @filename: The name of the file
+ * @av: The terminal args program was invoked with
  * @env: list of environment variables
  *
  * Return: 1 on success
  */
 
-int file_input_mode(char *filename, char **env)
+int file_input_mode(char *filename, char **av, char **env)
 {
-	/**
-	 * Open file
-	 * read lines
-	 * run exec on each lines
-	 */
-	return (1);
+	FILE *file_stream;
+	ssize_t nread;
+	size_t n = 128;
+	char *buffer = NULL;
 
+	file_stream = fopen(filename, "r");
+	if (file_stream != NULL)
+	{
+		while ((nread = _getline(&buffer, &n, file_stream)) > 0)
+		{
+			executioner(buffer, av, env);
+		}
+		free(buffer);
+	}
+	return (1);
 }
 
 /**
@@ -129,7 +113,7 @@ int main(int ac, char **av, char **env)
 	else if (ac == 2)
 	{
 		/* File input mode */
-		file_input_mode(av[1], env);
+		file_input_mode(av[1], av, env);
 	}
 	else
 	{
