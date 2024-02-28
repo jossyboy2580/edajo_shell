@@ -45,9 +45,11 @@ void executioner(char *buffer, char **av, char **env)
 	char *variable_replaced;
 	static int count = 1;
 	int i = 0;
+	int j = 0;
 
 	rmv_nwline(buffer);
 	variable_replaced = check_path(buffer);
+	free(buffer);
 	separated = _strtok(variable_replaced, ";");
 	free(variable_replaced);
 	while (separated[i] != NULL)
@@ -61,6 +63,9 @@ void executioner(char *buffer, char **av, char **env)
 			printf("%s: ", av[0] + 2);
 			fflush(stdout);
 			run_command(args, env);
+			for (j = 0; args[j] != NULL; j++)
+				free(args[j]);
+			free(args);
 		}
 		else if (is_builtin(args[0]))
 		{
@@ -70,8 +75,8 @@ void executioner(char *buffer, char **av, char **env)
 		{
 			printf("%s: %d: %s: not found\n", av[0] + 2, count++, args[0]);
 		}
-		free_vec(args);
+		free(separated[i]);
 		i++;
 	}
-	free_vec(separated);
+	free(separated);
 }

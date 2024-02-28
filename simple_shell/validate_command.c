@@ -72,7 +72,6 @@ char *path_builder(char **paths_v, char *str)
 		}
 		j++;
 	}
-	free_vec(paths_v);
 	return (NULL);
 }
 
@@ -90,6 +89,7 @@ char *validate_command(char *str, char **env)
 {
 	struct stat st;
 	char *paths;
+	char *final_path;
 	char **paths_v;
 	int fstat_status;
 
@@ -99,7 +99,8 @@ char *validate_command(char *str, char **env)
 		fstat_status = stat(str, &st);
 		if (fstat_status == 0)
 		{
-			return (strdup(str));
+			final_path = strdup(str);
+			return (final_path);
 		}
 		else
 		{
@@ -110,7 +111,9 @@ char *validate_command(char *str, char **env)
 	{
 		paths = _getenv("PATH", env);
 		paths_v = _strtok(paths, ":");
-		return (path_builder(paths_v, str));
+		final_path = path_builder(paths_v, str);
+		free_vec(paths_v);
+		return (final_path);
 	}
 	return (NULL);
 }

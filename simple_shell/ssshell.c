@@ -32,8 +32,8 @@ int interactive_mode(char **av, char **env)
 			return (-1);
 		}
 		executioner(command, av, env);
+		command = NULL;
 	}
-	free(command);
 	return (1);
 }
 
